@@ -1,21 +1,17 @@
-import { IconButton as MuiIconButton } from '@mui/material'
-import wrapTooltip from '../../utils/wrapTooltip'
+import { IconButton as MuiIconButton } from "@mui/material"
+import wrapTooltip from "@/utils/wrapTooltip"
+import { forwardRef } from "react"
 
-export default function IconButton ({
-  icon: Icon,
-  size = 'small',
-  color = 'primary',
-  tooltip,
-  ...other
-}) {
-
-  return wrapTooltip((
-    <MuiIconButton
-      {...other}
-      size={size}
-      color={color}
-    >
-      <Icon fontSize='inherit' />
-    </MuiIconButton>
-  ), tooltip)
+function IconButton(
+  { icon: Icon, size = "small", color = "primary", tooltip, ...other },
+  ref
+) {
+  return wrapTooltip(
+    <MuiIconButton ref={ref} {...other} size={size} color={color}>
+      <Icon fontSize="inherit" />
+    </MuiIconButton>,
+    tooltip
+  )
 }
+
+export default forwardRef(IconButton)

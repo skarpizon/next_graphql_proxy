@@ -1,6 +1,7 @@
 ## Description
 
 Proxy implementation example (RestAPI => Apollo GQL) and SSR frontend (next + materialui v5)
+This is not a fully completed project. It is kit of components, factories and proxy system.
 
 ## Authorization
 
@@ -11,6 +12,10 @@ The token is renewed automatically upon expiration.
 
 A [small system](./src/components/core/Form.jsx) for managing the state of forms through the context has been implemented. 
 This is potentially a very flexible option for filling and validating complex forms. 
+
+## Factories
+
+Samples of some factories located [here](./src/components/utils/formFactories.js). It allows you to reduce boilerplate code in similar situations.
 
 ## Theme
 

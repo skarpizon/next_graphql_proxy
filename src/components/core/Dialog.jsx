@@ -1,21 +1,19 @@
-import React from 'react'
+import React from "react"
 import {
   Dialog as MuiDialog,
   DialogActions,
   DialogContent,
-  DialogTitle as MuiDialogTitle,
   IconButton,
   styled,
   Typography
-} from '@mui/material'
-import { bindAll } from 'lodash-es'
-import Button from './Button'
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
-import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
+} from "@mui/material"
+import { bindAll } from "lodash-es"
+import Button from "./Button"
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 
-const DialogTitleDiv = styled('div')(({ theme }) => ({
+const DialogTitleDiv = styled("div")(({ theme }) => ({
   padding: theme.spacing(2, 7, 2, 3),
-  '&+.MuiDialogContent-root': {
+  "&+.MuiDialogContent-root": {
     paddingTop: theme.spacing(1)
   }
 }))
@@ -25,28 +23,26 @@ const DialogTitle = (props) => {
 
   return (
     <DialogTitleDiv>
-      <Typography variant='h6'>
-        {children}
-      </Typography>
-      {onClose
-        ? (
-          <IconButton onClick={onClose} sx={{
-            position: 'absolute',
+      <Typography variant="h6">{children}</Typography>
+      {onClose ? (
+        <IconButton
+          onClick={onClose}
+          sx={{
+            position: "absolute",
             top: 0,
             right: 0,
             margin: 1
-          }}>
-            <CloseRoundedIcon />
-          </IconButton>
-          )
-        : null}
+          }}
+        >
+          <CloseRoundedIcon />
+        </IconButton>
+      ) : null}
     </DialogTitleDiv>
   )
 }
 
-
 class Dialog extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       open: false
@@ -54,21 +50,22 @@ class Dialog extends React.Component {
     this.resolver = null
     this.rejecter = null
     bindAll(this, [
-      'open',
-      'close',
-      'handleClose',
-      'getContent'
+      "open",
+      "close",
+      "handleClose",
+      "getContent",
+      "handleBackClose"
     ])
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { open } = this.props
     if (open !== undefined) {
       this.setState({ open: open })
     }
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { open: propsOpen } = this.props
     const { open: prevPropsOpen } = prevProps
     if (propsOpen !== undefined && propsOpen !== prevPropsOpen) {
@@ -76,7 +73,7 @@ class Dialog extends React.Component {
     }
   }
 
-  open (props = {}) {
+  open(props = {}) {
     this.setState({ open: true })
     return new Promise((resolve, reject) => {
       this.resolver = resolve
@@ -84,12 +81,12 @@ class Dialog extends React.Component {
     })
   }
 
-  close (props = {}) {
+  close(props = {}) {
     const { type } = this.props
     const { accepted } = props
     if (accepted) {
       this.resolver()
-    } else if (this.rejecter && type === 'confirmation') {
+    } else if (this.rejecter && type === "confirmation") {
       this.rejecter(false)
     }
     const { onClose } = this.props
@@ -99,29 +96,45 @@ class Dialog extends React.Component {
     this.setState({ open: false })
   }
 
-  handleClose (props) {
+  handleClose(props) {
     this.close(props)
   }
 
-  getContent () {
-    const { classes, variant, type, appBar, title, titleActions, contentConfig = {}, children } = this.props
+  handleBackClose(props) {
+    const { disableBackClose = false } = this.props
+    if (!disableBackClose) this.close(props)
+  }
+
+  getContent() {
+    const {
+      classes,
+      variant,
+      type,
+      appBar,
+      title,
+      titleActions,
+      contentConfig = {},
+      children
+    } = this.props
     const { text, confirmLabel, rejectLabel } = contentConfig
     switch (type) {
-      case 'confirmation': {
+      case "confirmation": {
         return (
           <>
-            <DialogTitle onClose={() => this.close({ accepted: false })}>{title || 'Confirm the action'}</DialogTitle>
-            {!!text && (
-              <DialogContent>
-                {text}
-              </DialogContent>
-            )}
+            <DialogTitle onClose={() => this.close({ accepted: false })}>
+              {title || "Confirm the action"}
+            </DialogTitle>
+            {!!text && <DialogContent>{text}</DialogContent>}
             {children}
             <DialogActions>
-              <Button color='error' onClick={() => this.close({ accepted: false })}>
+              <Button onClick={() => this.close({ accepted: false })}>
                 {rejectLabel}
               </Button>
-              <Button color='primary' autoFocus onClick={() => this.close({ accepted: true })}>
+              <Button
+                color="error"
+                autoFocus
+                onClick={() => this.close({ accepted: true })}
+              >
                 {confirmLabel}
               </Button>
             </DialogActions>
@@ -130,46 +143,56 @@ class Dialog extends React.Component {
       }
       default: {
         return (
-          <div className={(appBar || variant === 'dialog') ? '' : classes?.content}>
-            <DialogTitle titleActions={titleActions} onClose={() => this.close({ accepted: false })}>{title}</DialogTitle>
+          <div
+            className={appBar || variant === "dialog" ? "" : classes?.content}
+          >
+            <DialogTitle
+              titleActions={titleActions}
+              onClose={() => this.close({ accepted: false })}
+            >
+              {title}
+            </DialogTitle>
             {children}
-            {
-              variant === 'dialog' && (confirmLabel || rejectLabel) && (
-                <DialogActions>
-                  {
-                    !!rejectLabel && (
-                      <Button color='primary' onClick={() => this.close({ accepted: false })}>
-                        {rejectLabel}
-                      </Button>
-                    )
-                  }
-                  {
-                    !!confirmLabel && (
-                      <Button color='primary' autoFocus onClick={() => this.close({ accepted: true })}>
-                        {confirmLabel}
-                      </Button>
-                    )
-                  }
-                </DialogActions>
-              )
-            }
+            {variant === "dialog" && (confirmLabel || rejectLabel) && (
+              <DialogActions>
+                {!!rejectLabel && (
+                  <Button
+                    color="primary"
+                    onClick={() => this.close({ accepted: false })}
+                  >
+                    {rejectLabel}
+                  </Button>
+                )}
+                {!!confirmLabel && (
+                  <Button
+                    color="primary"
+                    autoFocus
+                    onClick={() => this.close({ accepted: true })}
+                  >
+                    {confirmLabel}
+                  </Button>
+                )}
+              </DialogActions>
+            )}
           </div>
         )
       }
     }
   }
 
-  render () {
+  render() {
     const { open } = this.state
     const {
       variant,
       type,
       titleActions,
-      scroll = 'body',
-      maxWidth = 'md',
+      scroll = "body",
+      maxWidth = "md",
       children,
       contentConfig,
+      fullScreen,
       onClose,
+      disableBackClose,
       ...other
     } = this.props
     const content = this.getContent()
@@ -177,9 +200,9 @@ class Dialog extends React.Component {
       return (
         <MuiDialog
           open={open}
-          onClose={this.handleClose}
+          onClose={this.handleBackClose}
           scroll={scroll}
-          fullWidth
+          fullScreen={fullScreen}
           maxWidth={maxWidth}
           {...other}
         >

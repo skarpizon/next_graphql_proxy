@@ -1,0 +1,21 @@
+{
+  "env": {
+    "es2021": true,
+    "node": true
+  },
+  "extends": ["next", "prettier"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {
+    "react-hooks/exhaustive-deps": "off"
+  },
+  "plugins": ["prettier"],
+  "globals": {
+    "React": "writable"
+  }
+}

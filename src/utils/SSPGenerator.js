@@ -1,7 +1,6 @@
-import { addApolloState, initializeApollo } from '../apolloClient'
+import { addApolloState, initializeApollo } from "../apolloClient"
 
-
-export default (query) => async (context) => {
+const SSPGenerator = (query) => async (context) => {
   const cookie = context.req.headers.cookie
   const apolloClient = initializeApollo()
 
@@ -11,6 +10,8 @@ export default (query) => async (context) => {
   })
 
   return addApolloState(apolloClient, {
-    props: {},
+    props: {}
   })
 }
+
+export default SSPGenerator

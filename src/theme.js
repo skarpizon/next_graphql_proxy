@@ -1,9 +1,10 @@
-import { createTheme } from '@mui/material/styles'
+import { createTheme } from "@mui/material/styles"
 
-const getTheme = (themeMode) => createTheme({
-  palette: {
-    mode: themeMode,
-  },
-})
+const getTheme = (themeMode) =>
+  createTheme({
+    palette: {
+      mode: themeMode
+    }
+  })
 
 export default getTheme

@@ -1,17 +1,15 @@
-import { TextField as MuiTextField, useEventCallback } from '@mui/material'
+import { TextField as MuiTextField, useEventCallback } from "@mui/material"
 
-
-export default function TextField ({
+function TextField({
   label,
   value,
   onChange,
-  variant = 'outlined',
-  size = 'small',
+  variant = "outlined",
+  size = "small",
   ...other
 }) {
-
   const handleChange = useEventCallback(
-    (e) => onChange ? onChange(e.target.value) : null,
+    (e) => (onChange ? onChange(e.target.value) : null),
     [onChange]
   )
 
@@ -26,3 +24,5 @@ export default function TextField ({
     />
   )
 }
+
+export default TextField

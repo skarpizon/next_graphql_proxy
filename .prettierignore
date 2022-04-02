@@ -1,0 +1,9 @@
+node_modules
+.next
+img
+public
+README.md
+.eslintrc.json
+jsconfig.json
+package.json
+package-lock.json

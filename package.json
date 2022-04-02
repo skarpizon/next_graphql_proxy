@@ -1,11 +1,19 @@
 {
-  "name": "next_graphql_proxy",
+  "name": "proxy",
   "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "prod": "next start",
     "build": "next build",
-    "start": "node ./server.js",
-    "lint": "next lint"
+    "start": "cross-env GRAPHQL_GATEWAY_URL=https://gateway.com/graphql SERVER_API_URL=https://server.com/api/v1/ node ./server.js",
+    "lint": "next lint",
+    "prettier": "npx prettier --write .",
+    "prepare": "husky install",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@apollo/client": "^3.5.9",
@@ -21,14 +29,27 @@
     "cookie": "^0.4.2",
     "cors": "^2.8.5",
     "deepmerge": "^4.2.2",
-    "eslint": "^8.8.0",
-    "eslint-config-next": "^12.0.10",
     "express": "^4.17.2",
     "graphql": "^16.3.0",
+    "graphql-scalars": "^1.16.0",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "next": "^12.0.10",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "eslint": "^8.12.0",
+    "eslint-config-next": "^12.1.1",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-react": "^7.29.4",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.3.4",
+    "prettier": "^2.6.1"
   }
 }

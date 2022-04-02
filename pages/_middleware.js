@@ -1,61 +1,48 @@
-import { gql } from '@apollo/client'
-import { NextResponse } from 'next/server'
-import { initializeApollo } from '../src/apolloClient'
+import { NextResponse } from "next/server"
 
-const ACCESS_TOKEN_MUTATION = gql`
-  mutation getAccessToken($token: String!) {
-    accessToken(token: $token) {
-      access_token
-    }
-  }
-`
+const baseUrl = process.env.SERVER_API_URL
 
 export async function middleware(request, ev) {
-  console.log('middle', request);
-  console.log('request.nextUrl.pathname', request.nextUrl.pathname);
   let response = NextResponse.next()
 
-  if (request.nextUrl.pathname.includes('/auth')) {
-    if (request.nextUrl.pathname.includes('/logout')) {
-      console.log('request', request);
-      response = NextResponse.redirect('/auth')
-      response.clearCookie('refresh_token')
-      response.clearCookie('access_token')
-      console.log('response', response);
+  if (request.nextUrl.pathname.includes("/auth")) {
+    if (request.nextUrl.pathname.includes("/logout")) {
+      response = NextResponse.redirect(new URL("/auth", request.url))
+      response.clearCookie("refresh_token")
+      response.clearCookie("access_token")
       return response
     }
-    if (request.cookies['refresh_token']) {
-      return NextResponse.redirect('/')
+    if (request.cookies["refresh_token"]) {
+      return NextResponse.redirect(new URL("/", request.url))
     }
   } else {
-    if (!request.cookies['refresh_token']) {
-      return NextResponse.redirect('/auth')
+    if (!request.cookies["refresh_token"]) {
+      return NextResponse.redirect(new URL("/auth", request.url))
     }
   }
 
-  if (request.cookies['refresh_token'] && !request.cookies['access_token']) {
+  if (request.cookies["refresh_token"] && !request.cookies["access_token"]) {
     try {
-      const apolloClient = initializeApollo()
-  
-      const res = await apolloClient.mutate({
-        mutation: ACCESS_TOKEN_MUTATION,
-        variables: {
-          token: request.cookies['refresh_token']
-        }
+      const res = await fetch(`${baseUrl}/users/get_access_token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          refresh_token: request.cookies["refresh_token"]
+        })
       })
-  
-      const at = res?.data?.accessToken?.access_token
-  
+
+      const at = (await res.json())?.token
+
       if (at) {
-        response.cookie('access_token', at, {
+        response.cookie("access_token", at, {
           maxAge: 7000000,
           httpOnly: true
         })
       }
     } catch (error) {
-      response = NextResponse.redirect('/auth')
-      response.clearCookie('refresh_token')
-      response.clearCookie('access_token')
+      response = NextResponse.redirect(new URL("/auth", request.url))
+      response.clearCookie("refresh_token")
+      response.clearCookie("access_token")
       return response
     }
   }

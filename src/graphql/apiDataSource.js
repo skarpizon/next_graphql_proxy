@@ -1,19 +1,19 @@
-const { RESTDataSource } = require('apollo-datasource-rest')
+const { RESTDataSource } = require("apollo-datasource-rest")
 
-function getApiUrl (url, id, after) {
-  return `${url}${id ? `/${id}` : ''}${after ? `/${after}` : ''}`
+function getApiUrl(url, id, after) {
+  return `${url}${id ? `/${id}` : ""}${after ? `/${after}` : ""}`
 }
 
-const BASE_URL = 'server-url-with-rest'
+const BASE_URL = process.env.SERVER_API_URL
 
-const USERS_BRANCH = '/users'
-const SIGNUP_LEAF = USERS_BRANCH + '/sign_up'
-const REFRESH_TOKEN_LEAF = USERS_BRANCH + '/get_refresh_token'
-const ACCESS_TOKEN_LEAF = USERS_BRANCH + '/get_access_token'
-const CURRENT_USER_LEAF = USERS_BRANCH + '/current'
-
-const COMPUTERS_BRANCH = '/computers'
-const CREDENTIALS_BRANCH = '/credentials'
+const USERS_BRANCH = "/users"
+const SIGNUP_LEAF = USERS_BRANCH + "/sign_up"
+const REFRESH_TOKEN_LEAF = USERS_BRANCH + "/get_refresh_token"
+const ACCESS_TOKEN_LEAF = USERS_BRANCH + "/get_access_token"
+const CURRENT_USER_LEAF = USERS_BRANCH + "/current"
+const CONFIRM_USER_LEAF = USERS_BRANCH + "/confirm_registration"
+const REQUEST_RECOVERY_LEAF = USERS_BRANCH + "/send_password_recovery_code"
+const RECOVER_PASSWORD_LEAF = USERS_BRANCH + "/recover_password"
 
 class Api extends RESTDataSource {
   constructor() {
@@ -26,12 +26,15 @@ class Api extends RESTDataSource {
       if (!this.context.access_token && request.path !== ACCESS_TOKEN_LEAF) {
         await this.getAccessToken()
       }
-      request.headers.set('Authorization', `Bearer ${this.context.access_token}`)
+      request.headers.set(
+        "Authorization",
+        `Bearer ${this.context.access_token}`
+      )
     }
     return request
   }
 
-  async getRefreshToken (data) {
+  async getRefreshToken(data) {
     const res = await this.post(REFRESH_TOKEN_LEAF, data)
     const token = res?.token
     this.context.refresh_token = token
@@ -41,10 +44,13 @@ class Api extends RESTDataSource {
     }
   }
 
-  async getAccessToken (data) {
-    const res = await this.post(ACCESS_TOKEN_LEAF, data || {
-      refresh_token: this.context.refresh_token
-    })
+  async getAccessToken(data) {
+    const res = await this.post(
+      ACCESS_TOKEN_LEAF,
+      data || {
+        refresh_token: this.context.refresh_token
+      }
+    )
     const token = res?.token
     this.context.access_token = token
     this.context.new_access_token = token
@@ -53,12 +59,16 @@ class Api extends RESTDataSource {
     }
   }
 
-  async auth (data) {
+  async auth(data) {
     const token = await this.getRefreshToken(data)
     return token
   }
 
-  async signUp (data) {
+  async currentUser() {
+    return this.get(getApiUrl(CURRENT_USER_LEAF))
+  }
+
+  async signUp(data) {
     try {
       await this.post(SIGNUP_LEAF, data)
       return {
@@ -66,36 +76,50 @@ class Api extends RESTDataSource {
       }
     } catch (error) {
       return {
-        error: error
+        success: false,
+        error: error?.extensions?.response?.body?.error ?? true
       }
     }
   }
 
-  async getComputers () {
-    return this.get(COMPUTERS_BRANCH)
-  }
-
-  async getCredentials (id) {
-    return this.get(getApiUrl(CREDENTIALS_BRANCH, id))
-  }
-
-  async createCredential (data) {
-    return this.post(CREDENTIALS_BRANCH, data)
-  }
-
-  async updateCredential (data) {
-    return this.put(getApiUrl(CREDENTIALS_BRANCH, data?.id), data)
-  }
-
-  async deleteCredential (data) {
+  async signUpConfirm(data) {
     try {
-      await this.delete(getApiUrl(CREDENTIALS_BRANCH, data?.id))
+      await this.post(CONFIRM_USER_LEAF, data)
       return {
         success: true
       }
     } catch (error) {
       return {
-        error: error
+        success: false,
+        error: error?.extensions?.response?.body?.error ?? true
+      }
+    }
+  }
+
+  async getRecoveryCode(data) {
+    try {
+      await this.post(REQUEST_RECOVERY_LEAF, data)
+      return {
+        success: true
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error?.extensions?.response?.body?.error ?? true
+      }
+    }
+  }
+
+  async recoverPassword(data) {
+    try {
+      await this.post(RECOVER_PASSWORD_LEAF, data)
+      return {
+        success: true
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error?.extensions?.response?.body?.error ?? true
       }
     }
   }
